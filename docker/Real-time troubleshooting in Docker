@@ -1,0 +1,39 @@
+
+Real-time troubleshooting in Docker:
+
+1. Question: How would you free up disk space on a Docker host? 
+Answer: Remove unused containers with: docker container prune
+Remove unused images (dangling and unreferenced): docker image prune -a
+Remove unused volumes: docker volume prune
+Clean up unused networks: docker network prune
+If you need to reclaim space from stopped containers, old images, and other objects in one go: docker system prune -a
+
+2. Question: How would you troubleshoot and debug a running Docker container?
+Answer: Access the container’s shell using: docker exec -it <container_name> /bin/
+Check container logs using: docker logs <container_name>
+Inspect the container’s state with: docker inspect <container_name>
+
+3. How would you troubleshoot and resolve network connectivity issues between Docker containers?
+Answer: Verify network configuration using: docker network inspect <network_name>
+Check connectivity between containers using: docker exec -it <container_name> ping <other_container_ip_or_name>
+If DNS resolution is failing, ensure you are using the correct container names, as Docker provides built-in DNS resolution for containers on the same network.
+
+4. Question: How would you investigate and resolve a container that continuously restarts?
+Answer: Examine the logs using: docker logs <container_name>
+Use the docker inspect command to check the container’s restart policy: docker inspect <container_name> | grep RestartPolicy
+You may need to adjust the policy to avoid endless restarts: docker run --restart=on-failure:3 <container_image>
+
+5. Question: What steps would you take to secure a Docker container?
+Answer: Avoid running applications as root inside the container. In the Dockerfile, create a non-root user and set it: RUN useradd -ms /bin/ myuser && USER myuser
+Enable user namespaces to map container users to different users on the host.
+Only expose the necessary ports and limit external access with firewall rules. You can also use Docker’s bridge network mode for isolation.
+
+6. Question: How would you roll back to a previous Docker image version?
+Answer: If you tagged the previous image version properly, you can start the container with the old version: docker run -d my_image:previous_version
+If the old image is still present on the system, you can list all available images and their tags using: docker images
+Then, run the older version using its image ID: docker run -d <image_id>
+
+7. Question: How would you force stop a Docker container that refuses to stop?
+Answer: Attempt a graceful stop: docker stop <container_name>
+If the container does not stop after the default timeout, you can forcibly kill it using: docker kill <container_name>
+If the issue persists and the container is unresponsive, you can investigate deeper using docker inspect to see if there are resource constraints or issues with the container’s process. Additionally, check the system's logs for any low-level kernel issues that may be affecting Docker.
